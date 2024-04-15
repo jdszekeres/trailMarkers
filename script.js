@@ -4,7 +4,7 @@ const activities = {
     hiking: 'fa-person-hiking',
     walking: 'fa-person-walking',
     swimming: 'fa-person-swimming'
-}
+}//FA icons corresponding to the GPX Strava workout types
 // Define the Vue app
 const app = {
     trackLoaded: false,
@@ -12,7 +12,7 @@ const app = {
     trackMetadata: {},
     waypoints: [],
     distMarker: 0,
-    maxdistMarker: 0,
+    maxDistMarker: 0,
     formattedTimeAtdistMarker: null,
     initialTime: 0,
     
@@ -25,32 +25,32 @@ const app = {
                 const parser = new DOMParser();
                 this.trackData = parser.parseFromString(gpxData, "application/xml"); //convert text into DOM
                 this.trackLoaded = true;
-                this.getMetadata();
-                this.maxdistMarker = this.calculateMaxdistMarker(); //add up all haversine distances
+                this.getMetadata(); //parse for Strava metadata like name and activity type
+                this.maxDistMarker = this.calculatemaxDistMarker(); //add up all haversine distances
                 this.initialTime = new Date(
                     this.trackData
                     .getElementsByTagName("trk")[0]
                     .getElementsByTagName("trkseg")[0]
-                    .children[0].children[1].textContent //basically find the first element of a workout
+                    .children[0].children[1].textContent //basically find date the first element of a workout
                 ).getTime(); // and convert in into epoch time
             };
             reader.readAsText(file);
         }
     },
     preventDefaultEnter(e) {
-        e.target.classList.add("hovering");
+        e.target.classList.add("hovering");//add class to dropper
         e.preventDefault();
         return false;
     },
     preventDefaultExit(e) {
-        e.target.classList.remove("hovering");
+        e.target.classList.remove("hovering");//remove class from dropper
         e.preventDefault();
         return false;
     },
     handleDragDrop(event) {
         event.preventDefault();
         event.target.classList.remove("hovering");
-        this.handleFileUpload({target: event.dataTransfer})
+        this.handleFileUpload({target: event.dataTransfer})//rephrase dataTransfer to something handle file upload can handle
         
     },
     getMetadata() {
@@ -63,7 +63,7 @@ const app = {
             this.trackMetadata["icon"] = activities[this.trackMetadata["type"]];
         }
     },
-    calculateMaxdistMarker() {
+    calculatemaxDistMarker() {
         if (this.trackLoaded) {
             const tracks = this.trackData.getElementsByTagName("trk")[0];
             const track_segs = Array.from(tracks.getElementsByTagName("trkseg")); //get a list of segments
@@ -109,7 +109,7 @@ const app = {
     },//definitely not stolen from https://stackoverflow.com/a/30316500
     makeSurePeopleDontGoTooHigh(event) {
         const num  = event.target.value; //this is in miles
-        event.target.value = Math.max(0, Math.min(num, this.maxdistMarker/5280)); //clamp value to a normal range
+        event.target.value = Math.max(0, Math.min(num, this.maxDistMarker/5280)); //clamp value to a normal range
         this.distMarker = event.target.value * 5280; //update distMarker
     },
     calculateTime() {
@@ -135,7 +135,7 @@ const app = {
             const endEpochTime = new Date(waypoint.children[1].textContent).getTime()
             const timeSinceBeginning = (endEpochTime - this.initialTime) / 1000; // find seconds between the two values
             
-            this.formattedTimeAtdistMarker = new Date(timeSinceBeginning * 1000).toISOString().slice(11, 19);
+            this.formattedTimeAtdistMarker = new Date(timeSinceBeginning * 1000).toISOString().slice(11, 19);//https://stackoverflow.com/a/25279340
             return;
         }
         }
